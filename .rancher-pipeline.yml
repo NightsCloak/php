@@ -1,0 +1,16 @@
+stages:
+- name: Build
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: registry.gitlab.com/tython/php:base
+      pushRemote: true
+      registry: registry.gitlab.com
+timeout: 60
+branch:
+  include:
+    - master
+  exclude:
+    - docker
+notification: {}

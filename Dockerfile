@@ -1,0 +1,44 @@
+FROM php:7.4.4-fpm
+
+WORKDIR /var/www/html
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+	$PHPIZE_DEPS \
+    default-mysql-client \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    libzip-dev \
+    libxml2-dev \
+    libicu-dev \
+    curl \
+    nano \
+    libcurl4-openssl-dev \
+    zip \
+    jpegoptim optipng pngquant gifsicle \
+    vim \
+    unzip \
+    git \
+    bzip2 \
+    libbz2-dev \
+    openssh-client \
+    npm \
+    nano
+
+#Update NPM
+RUN npm i npm@latest -g
+RUN npm install -g yarn
+
+#Install extensions
+RUN docker-php-ext-install pdo_mysql zip exif pcntl xmlrpc intl bz2 bcmath
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install gd
+
+RUN pecl install -o -f redis \
+  &&  rm -rf /tmp/pear \
+  && docker-php-ext-enable redis
+
+#Install Composer
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && composer global require hirak/prestissimo --no-plugins --no-scripts
