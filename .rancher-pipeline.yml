@@ -10,7 +10,7 @@ stages:
 timeout: 60
 branch:
   include:
-    - master
+  - master
   exclude:
-    - docker
+  - docker
 notification: {}
