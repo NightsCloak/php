@@ -11,6 +11,4 @@ timeout: 60
 branch:
   include:
   - master
-  exclude:
-  - docker
 notification: {}
