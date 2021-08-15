@@ -25,7 +25,10 @@ RUN apt-get update && apt-get install -y \
     libbz2-dev \
     openssh-client \
     npm \
-    nano
+
+#Update Node
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+RUN apt install -y nodejs
 
 #Update NPM
 RUN npm i npm@latest -g
@@ -41,4 +44,4 @@ RUN pecl install -o -f redis \
   && docker-php-ext-enable redis
 
 #Install Composer
-RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && composer global require hirak/prestissimo --no-plugins --no-scripts
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
