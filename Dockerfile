@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y \
     git \
     bzip2 \
     libbz2-dev \
-    openssh-client \
+    openssh-client
 
 #Update Node
 RUN curl -L https://deb.nodesource.com/setup_14.x | bash
