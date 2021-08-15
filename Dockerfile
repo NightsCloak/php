@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
     bzip2 \
     libbz2-dev \
     openssh-client \
-    npm \
+
 
 #Update Node
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
