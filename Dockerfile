@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y \
 
 #Update Node
 RUN curl -L https://deb.nodesource.com/setup_14.x | bash
-RUN apt install -y nodejs npm
+RUN apt install -y nodejs
 
 #Update NPM
 RUN npm i npm@latest -g
