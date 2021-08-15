@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
     openssh-client \
 
 #Update Node
-RUN curl -fsL https://deb.nodesource.com/setup_14.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash 
 RUN apt install -y nodejs
 
 #Update NPM
