@@ -2,6 +2,10 @@ FROM php:7.4.4-fpm
 
 WORKDIR /var/www/html
 
+#Update Node
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+RUN apt install -y nodejs
+
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -26,9 +30,7 @@ RUN apt-get update && apt-get install -y \
     openssh-client \
 
 
-#Update Node
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-RUN apt install -y nodejs
+
 
 #Update NPM
 RUN npm i npm@latest -g
