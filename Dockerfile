@@ -43,5 +43,4 @@ RUN pecl install -o -f redis \
   && docker-php-ext-enable redis
 
 #Install Composer
-RUN curl -L https://getcomposer.org/installer | php --
-RUN mv composer.phar /usr/local/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
