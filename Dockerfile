@@ -34,7 +34,7 @@ RUN npm i npm@latest -g
 RUN npm install -g yarn
 
 #Install extensions
-RUN docker-php-ext-install pdo_mysql zip exif pcntl intl bz2 bcmath
+RUN docker-php-ext-install pdo_mysql zip exif pcntl intl bz2 bcmath opcache
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install gd
 
