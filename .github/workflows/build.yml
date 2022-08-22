@@ -24,5 +24,5 @@ jobs:
       # Container build and push to a Azure Container Registry (ACR)
     - name: Build Image
       run: |
-        docker build . -t ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:latest -t ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:${{ env.GITHUB_SHA }} --progress plain
+        docker build . -t ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:latest -t ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:${{ GITHUB_SHA }} --progress plain
         docker push ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:latest
