@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@main
 
     - name: Gitlab Registry Login
-      uses: docker/login-actions@v2
+      uses: docker/login-action@v2
       with:
           registry: ${{ env.REGISTRY_NAME }}
           username: ${{ secrets.GITLAB_USERNAME }}
