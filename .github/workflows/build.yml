@@ -5,8 +5,8 @@ on:
 
 env:
   REGISTRY_NAME: registry.ajnoz.com
+  PROJECT: nightscloak
   APP_NAME: php
-  ENVIRONMENT: base
 
 jobs:
   build:
@@ -24,5 +24,5 @@ jobs:
       # Container build and push to a Azure Container Registry (ACR)
     - name: Build Image
       run: |
-        docker build . -t ${{ env.REGISTRY_NAME }}/${{ env.APP_NAME }}:latest --progress plain
+        docker build . -t ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:latest --progress plain
         docker push ${{ env.REGISTRY_NAME }}/${{ env.APP_NAME }}:latest
