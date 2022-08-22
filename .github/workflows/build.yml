@@ -25,4 +25,4 @@ jobs:
     - name: Build Image
       run: |
         docker build . -t ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:latest --progress plain
-        docker push ${{ env.REGISTRY_NAME }}/${{ env.APP_NAME }}:latest
+        docker push ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:latest
