@@ -1,9 +1,9 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm
 
 WORKDIR /var/www/html
 RUN ls -al
 # Install dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt update && apt-get install -y \
     build-essential \
 	$PHPIZE_DEPS \
     default-mysql-client \
