@@ -1,9 +1,9 @@
-FROM php:8.2-fpm
+FROM php:8.3.9-fpm
 
 WORKDIR /var/www/html
 RUN ls -al
 # Install dependencies
-RUN apt update && apt-get install -y \
+RUN apt update && apt install -y \
     build-essential \
 	$PHPIZE_DEPS \
     default-mysql-client \
@@ -23,7 +23,8 @@ RUN apt update && apt-get install -y \
     git \
     bzip2 \
     libbz2-dev \
-    openssh-client
+    openssh-client \
+    ffmpeg
 
 #Update Node
 RUN curl -L https://deb.nodesource.com/setup_18.x | bash

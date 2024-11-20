@@ -4,26 +4,112 @@ on:
       - master
 
 env:
-  REGISTRY_NAME: registry.ajnoz.com
+  REGISTRY_URI: registry.ajnoz.com
   PROJECT: nightscloak
   APP_NAME: php
+  ENVIRONMENT: base
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm/v7
+          - linux/arm/v8
+          - linux/arm64
     steps:
-    - uses: actions/checkout@main
+      # Echo Platform
+      - name: Prepare
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
-      # Login to Gitlab
-    - name: Gitlab Registry Login
-      uses: docker/login-action@v2
-      with:
-          registry: ${{ env.REGISTRY_NAME }}
+      - uses: actions/checkout@main
+
+        # Login to Gitlab
+      - name: Gitlab Registry Login
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY_URI }}
           username: ${{ secrets.GITLAB_USERNAME }}
           password: ${{ secrets.GITLAB_TOKEN }}
 
-      # Container build and push to a Azure Container Registry (ACR)
-    - name: Build Image
-      run: |
-        docker build . -t ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:latest -t ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:${{ github.sha }} --progress plain
-        docker push ${{ env.REGISTRY_NAME }}/${{ env.PROJECT }}/${{ env.APP_NAME }}
+      - name: Docker Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          flavor: |
+            latest=true
+          images: ${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }}
+
+      - name: Setup Qemu for multiplatform
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Container build and push to a Container Registry (ACR)
+      - name: Build and Push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=registry,ref=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }}:buildcache,mode=max
+          file: ./Dockerfile
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ env.PLATFORM_PAIR }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }}
+
+        # Login to Gitlab
+      - name: Gitlab Registry Login
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY_URI }}
+          username: ${{ secrets.GITLAB_USERNAME }}
+          password: ${{ secrets.GITLAB_TOKEN }}
+
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }}@sha256:%s ' *)
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }}:${{ steps.meta.outputs.version }} 
