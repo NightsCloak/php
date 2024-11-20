@@ -63,7 +63,7 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }}/${{ matrix.platform }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=registry,ref=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }}/${{ matrix.platform }}:buildcache
           cache-to: type=registry,ref=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}/${{ env.ENVIRONMENT }}/${{ matrix.platform }}:buildcache,mode=max
           file: ./Dockerfile

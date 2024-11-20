@@ -27,7 +27,7 @@ RUN apt update && apt install -y \
     ffmpeg
 
 #Update Node
-RUN curl -L https://deb.nodesource.com/setup_18.x | bash
+RUN curl -L https://deb.nodesource.com/setup_23.x | bash
 RUN apt install -y nodejs
 
 #Update NPM
