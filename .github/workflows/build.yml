@@ -20,15 +20,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [
-          {platform: linux/amd64, cache: cache-amd64},
-          {platform: linux/arm64, cache: cache-arm64}
-        ]
+        platform:
+          - linux/amd64
+          - linux/arm64
     steps:
       # Echo Platform
       - name: Prepare
         run: |
-          platform=${{ matrix.build.platform }}
+          platform=${{ matrix.platform }}
           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
       - uses: actions/checkout@main
@@ -71,11 +70,11 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: ${{ matrix.build.platform }}
+          platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=registry,ref=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:${{ matrix.build.cache }}
-          cache-to: type=registry,image-manifest=true,oci-mediaTypes=true,ref=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:${{ matrix.build.cache }},mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:cache-${{ env.PLATFORM_PAIR }}
+          cache-to: type=registry,image-manifest=true,oci-mediaTypes=true,ref=${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}:cache-${{ env.PLATFORM_PAIR }},mode=max
           file: ./Dockerfile
 
       - name: Export digest
