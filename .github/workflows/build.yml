@@ -57,6 +57,8 @@ jobs:
         with:
           flavor: |
             latest=true
+          tags: |
+            type=sha
           images: ${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}
 
       - name: Setup Qemu for multiplatform
@@ -112,6 +114,8 @@ jobs:
         with:
           flavor: |
             latest=true
+          tags: |
+            type=sha
           images: ${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}
 
       # Assume AWS Role and set kubectl
