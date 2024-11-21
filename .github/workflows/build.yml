@@ -55,10 +55,6 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          tags: |
-            # set latest tag for default branch
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=sha
           flavor: |
             latest=true
           images: ${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}
@@ -118,13 +114,21 @@ jobs:
             latest=true
           images: ${{ env.REGISTRY_URI }}/${{ env.PROJECT }}/${{ env.APP_NAME }}
 
-        # Login to Gitlab
-      - name: Gitlab Registry Login
-        uses: docker/login-action@v2
+      # Assume AWS Role and set kubectl
+      - name: Configure Aws Creds
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          registry: ${{ env.REGISTRY_URI }}
-          username: ${{ secrets.GITLAB_USERNAME }}
-          password: ${{ secrets.GITLAB_TOKEN }}
+          role-to-assume: arn:aws:iam::990860969901:role/Github
+          role-session-name: GitHub_AWS_ODIC
+          aws-region: ${{ env.AWS_REGION }}
+      - name: STS GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
+
+      # Connect to Container Registry
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Create manifest list and push
         working-directory: /tmp/digests
