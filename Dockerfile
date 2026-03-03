@@ -1,4 +1,4 @@
-FROM php:8.3.9-fpm
+FROM php:8.5.3-fpm
 
 WORKDIR /var/www/html
 RUN ls -al
